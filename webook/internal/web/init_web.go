@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func RegisterRoutes() (server *gin.Engine) {
+func RegisterRoutes(u *UserHandler) (server *gin.Engine) {
 	server = gin.Default()
 
 	//配置跨域请求
@@ -27,11 +27,10 @@ func RegisterRoutes() (server *gin.Engine) {
 		MaxAge: 12 * time.Hour,
 	}))
 
-	registerUsersRoutes(server)
+	registerUsersRoutes(server, u)
 	return
 }
-func registerUsersRoutes(server *gin.Engine) {
-	u := NewUserHandler()
+func registerUsersRoutes(server *gin.Engine, u *UserHandler) {
 	server.POST("/users/signup", u.SignUp)
 	server.POST("/users/login", u.Login)
 	server.GET("/users/profile", u.Profile)
