@@ -1,9 +1,9 @@
 package service
 
 import (
-	"basic-go/webook/internal/domain"
-	"basic-go/webook/internal/repository"
 	"context"
+	"webook/webook/internal/domain"
+	"webook/webook/internal/repository"
 )
 
 type UserService struct {

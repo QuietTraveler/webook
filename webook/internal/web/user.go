@@ -1,12 +1,12 @@
 package web
 
 import (
-	"basic-go/webook/internal/domain"
-	"basic-go/webook/internal/service"
 	"fmt"
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"webook/webook/internal/domain"
+	"webook/webook/internal/service"
 )
 
 // UserHandler 我准备在它上面定义跟用户有关的路由

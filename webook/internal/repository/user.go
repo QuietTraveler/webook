@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"basic-go/webook/internal/domain"
-	"basic-go/webook/internal/repository/dao"
 	"context"
+	"webook/webook/internal/domain"
+	"webook/webook/internal/repository/dao"
 )
 
 type UserRepository struct {
