@@ -41,6 +41,7 @@ func main() {
 
 	u := initUser(db)
 	server := web.RegisterRoutes(u)
+
 	err = server.Run(":8080")
 	if err != nil {
 		panic(err)
