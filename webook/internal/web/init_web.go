@@ -2,9 +2,12 @@ package web
 
 import (
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"strings"
 	"time"
+	"webook/webook/internal/web/middleware"
 )
 
 func RegisterRoutes(u *UserHandler) (server *gin.Engine) {
@@ -26,6 +29,24 @@ func RegisterRoutes(u *UserHandler) (server *gin.Engine) {
 		},
 		MaxAge: 12 * time.Hour,
 	}))
+
+	//配置session中间件
+	//用于解决HTTP协议的无状态性问题
+	//
+	//初始化一个cookie验证的会话存储器
+	//由于会话数据的保密性需求，使用cookie.NewStore创建一个会话存储实例
+	//使用"secret"作为加密密钥
+	store := cookie.NewStore([]byte("secret"))
+	// 配置会话中间件
+	// sessions.Sessions方法创建一个名为"mysession"的会话
+	// 使用上一行创建的store来存储会话数据
+	// 通过server.Use将该会话中间件挂载到http服务器中
+	// 以便每个请求都能进行会话管理
+	server.Use(sessions.Sessions("webook", store))
+
+	// 此部分用于验证用户是否已登录
+	server.Use(middleware.NewLoginMiddlewareBuilder().
+		IgnorePaths("/users/signup", "/users/login").Build())
 
 	registerUsersRoutes(server, u)
 	return
