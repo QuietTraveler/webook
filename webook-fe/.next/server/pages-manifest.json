@@ -2,6 +2,8 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
+  "/users/signup": "pages/users/signup.js",
   "/users/login": "pages/users/login.js",
-  "/users/signup": "pages/users/signup.js"
+  "/users/login_wechat": "pages/users/login_wechat.js",
+  "/users/login_sms": "pages/users/login_sms.js"
 }
