@@ -33,16 +33,18 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 	}
 }
 
-//func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
-//	userGroup := server.Group("/users")
-//	{
-//		userGroup.POST("/signup", u.SignUp)
-//		userGroup.POST("/login", u.Login)
-//		userGroup.POST("/edit", u.Edit)
-//		userGroup.GET("/profile", u.Profile)
-//	}
-//
-//}
+func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
+	ug := server.Group("/users")
+	ug.POST("/signup", u.SignUp)
+	ug.POST("/login", u.Login)
+	ug.GET("/profile", u.Profile)
+	ug.POST("/edit", u.Edit)
+	server.GET("/articles/list", u.lists)
+}
+
+func (u *UserHandler) lists(ctx *gin.Context) {
+	ctx.String(http.StatusOK, "hello world")
+}
 
 func (u *UserHandler) SignUp(ctx *gin.Context) {
 	type SignUpReq struct {
@@ -137,6 +139,11 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	sess := sessions.Default(ctx)
 	// 这里可以随便设置键值对,这是要放在 session 里面的值
 	sess.Set("userId", user.Id)
+	sess.Options(sessions.Options{
+		//Secure: true,
+		//HttpOnly: true,
+		MaxAge: 60,
+	})
 	err = sess.Save()
 	if err != nil {
 		return
@@ -146,9 +153,62 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
-	ctx.String(http.StatusOK, "profile")
+	sess := sessions.Default(ctx)
+	userId := sess.Get("userId")
+	profile, err := u.svc.Profile(ctx, userId.(int64))
+	if err != nil {
+		return
+	}
+	ctx.JSON(http.StatusOK, profile)
+}
+
+func (u *UserHandler) Logout(ctx *gin.Context) {
+	sess := sessions.Default(ctx)
+	sess.Options(sessions.Options{
+		MaxAge: -1,
+	})
+	err := sess.Save()
+	if err != nil {
+		return
+	}
+	ctx.String(http.StatusOK, "退出成功")
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
+	type userInfo struct {
+		name     string
+		birthday string
+		profile  string
+	}
 
+	var infoReq userInfo
+	err := ctx.Bind(&infoReq)
+	if err != nil {
+		return
+	}
+
+	if len(infoReq.name) > 10 {
+		ctx.String(http.StatusOK, "昵称过长")
+		return
+	}
+	if len(infoReq.birthday) != 10 ||
+		(infoReq.birthday[4] != '-' && infoReq.birthday[7] != '-') {
+		ctx.String(http.StatusOK, "日期格式不对")
+	}
+	if len(infoReq.profile) > 200 {
+		ctx.String(http.StatusOK, "个人简介过长")
+	}
+
+	sess := sessions.Default(ctx)
+	userId := sess.Get("userId")
+	err = u.svc.Edit(ctx, domain.User{
+		Id:       userId.(int64),
+		Name:     infoReq.name,
+		Birthday: infoReq.birthday,
+		Profile:  infoReq.profile,
+	})
+	if err != nil {
+		ctx.String(http.StatusOK, "系统错误")
+	}
+	ctx.String(http.StatusOK, "编辑成功")
 }

@@ -30,16 +30,6 @@
       "static/chunks/main.js",
       "static/chunks/pages/users/login.js"
     ],
-    "/users/login_sms": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/users/login_sms.js"
-    ],
-    "/users/login_wechat": [
-      "static/chunks/webpack.js",
-      "static/chunks/main.js",
-      "static/chunks/pages/users/login_wechat.js"
-    ],
     "/users/signup": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
