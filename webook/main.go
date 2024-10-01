@@ -48,8 +48,8 @@ func initWebServer() (server *gin.Engine) {
 	server.Use(cors.New(cors.Config{
 		//AllowOrigins: []string{"http://localhost:3000"}, // 使用明确的域名
 		//AllowMethods:     []string{"POST", "GET"},    // 明确允许的 HTTP 方法
-		AllowHeaders: []string{"Content-Type", "Authorization"}, // 确保必要的头部被允许
-		//	ExposeHeaders:    []string{"x-jwt-token"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"}, // 确保必要的头部被允许
+		ExposeHeaders:    []string{"x-jwt-token"},
 		AllowCredentials: true, // 允许 cookie
 		AllowOriginFunc: func(origin string) bool {
 			if strings.HasPrefix(origin, "http://localhost") {
@@ -82,9 +82,11 @@ func initWebServer() (server *gin.Engine) {
 	server.Use(sessions.Sessions("webook", store))
 
 	// 此部分用于验证用户是否已登录
-	server.Use(middleware.NewLoginMiddlewareBuilder().
-		IgnorePaths("/users/signup", "/users/login").Build())
+	//	server.Use(middleware.NewLoginMiddlewareBuilder().
+	//	IgnorePaths("/users/signup", "/users/login").Build())
 
+	server.Use(middleware.NewLoginJWTMiddlewareBuilder().
+		IgnorePaths("/users/signup", "/users/login").Build())
 	return
 }
 
