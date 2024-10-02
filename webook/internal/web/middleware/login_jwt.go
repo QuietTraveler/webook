@@ -58,6 +58,12 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 			return
 		}
 
+		if claims.UserAgent != ctx.Request.UserAgent() {
+			//严重的安全问题
+			ctx.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
 		//每10秒刷新一次
 		now := time.Now()
 		//这里检查 JWT 令牌的过期时间（claims.ExpiresAt）和当前时间的差值，判断是否少于 50 秒。

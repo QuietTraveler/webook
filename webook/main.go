@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/ecodeclub/ginx/middlewares/ratelimit"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -60,6 +60,15 @@ func initWebServer() (server *gin.Engine) {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	//限流
+	redisClient := redis.NewClient(&redis.Options{
+		Network: "tcp",
+		Addr:    "124.71.99.27:6379",
+	})
+	//创建限流器，设置时间窗口大小和请求阈值
+	limiter := ratelimit.NewRedisSlidingWindowLimiter(redisClient, 1*time.Second, 100)
+	server.Use(ratelimit.NewBuilder(limiter).Build())
+
 	//配置session中间件
 	//用于解决HTTP协议的无状态性问题
 	//
@@ -69,17 +78,17 @@ func initWebServer() (server *gin.Engine) {
 	//store := cookie.NewStore([]byte("secret"))
 	//store := memstore.NewStore([]byte("`4A:'n1H'U:50HQx;a1p1-er1jm3\"1)b"),
 	//	[]byte("3w&0yL23d@;2R1TV+iN`Jen\\C7AA266c"))
-	store, err := redis.NewStore(16, "tcp", "124.71.99.27:6379", "",
-		[]byte("`4A:'n1H'U:50HQx;a1p1-er1jm3\"1)b"), []byte("3w&0yL23d@;2R1TV+iN`Jen\\C7AA266c"))
-	if err != nil {
-		panic(err)
-	}
+	//store, err := redis.NewStore(16, "tcp", "124.71.99.27:6379", "",
+	//	[]byte("`4A:'n1H'U:50HQx;a1p1-er1jm3\"1)b"), []byte("3w&0yL23d@;2R1TV+iN`Jen\\C7AA266c"))
+	//if err != nil {
+	//	panic(err)
+	//}
 	// 配置会话中间件
 	// sessions.Sessions方法创建一个名为"mysession"的会话
 	// 使用上一行创建的store来存储会话数据
 	// 通过server.Use将该会话中间件挂载到http服务器中
 	// 以便每个请求都能进行会话管理
-	server.Use(sessions.Sessions("webook", store))
+	//server.Use(sessions.Sessions("webook", store))
 
 	// 此部分用于验证用户是否已登录
 	//	server.Use(middleware.NewLoginMiddlewareBuilder().

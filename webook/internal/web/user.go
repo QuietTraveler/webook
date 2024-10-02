@@ -20,6 +20,13 @@ type UserHandler struct {
 	passwordExp *regexp.Regexp
 }
 
+type UserClaims struct {
+	jwt.RegisteredClaims
+	//声明你自己要放进token里面的数据
+	Uid       int64
+	UserAgent string
+}
+
 func NewUserHandler(svc *service.UserService) *UserHandler {
 	const (
 		emailRegexPattern    = "[\\w!#$%&'*+/=?^_`{|}~-]+(?:\\.[\\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\\w](?:[\\w-]*[\\w])?\\.)+[\\w](?:[\\w-]*[\\w])?"
@@ -172,7 +179,6 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "用户名或密码不对")
 		return
 	}
-
 	if err != nil {
 		ctx.String(http.StatusOK, "系统错误")
 		return
@@ -181,14 +187,14 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	//步骤2
 	// 在这里用 JWT 设置登录态
 	// 生成一个 JWT token
-
 	claims := UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			// 设置过期时间
 			// 将当前时间加上一分钟，作为过期时间
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)),
 		},
-		Uid: user.Id,
+		Uid:       user.Id,
+		UserAgent: ctx.Request.UserAgent(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
@@ -277,10 +283,5 @@ func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
 		return
 	}
 	println(claims.Uid)
-}
-
-type UserClaims struct {
-	jwt.RegisteredClaims
-	//声明你自己要放进token里面的数据
-	Uid int64
+	ctx.String(http.StatusOK, "你的 profile")
 }

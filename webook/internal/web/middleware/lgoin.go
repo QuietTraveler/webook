@@ -15,12 +15,10 @@ type LoginMiddlewareBuilder struct {
 func NewLoginMiddlewareBuilder() *LoginMiddlewareBuilder {
 	return &LoginMiddlewareBuilder{}
 }
-
 func (l *LoginMiddlewareBuilder) IgnorePaths(paths ...string) *LoginMiddlewareBuilder {
 	l.paths = append(l.paths, paths...)
 	return l
 }
-
 func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 	// 用Go的方式编码解码
 	gob.Register(time.Now())
