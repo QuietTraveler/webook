@@ -7,13 +7,14 @@ import (
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"net/http"
 	"strings"
 	"time"
-	"webook/webook/internal/repository"
-	"webook/webook/internal/repository/dao"
-	"webook/webook/internal/service"
-	"webook/webook/internal/web"
-	"webook/webook/internal/web/middleware"
+	"webook/internal/repository"
+	"webook/internal/repository/dao"
+	"webook/internal/service"
+	"webook/internal/web"
+	"webook/internal/web/middleware"
 )
 
 func initDB() (db *gorm.DB, err error) {
@@ -100,14 +101,18 @@ func initWebServer() (server *gin.Engine) {
 }
 
 func main() {
-	db, err := initDB()
-	if err != nil {
-		panic(err)
-	}
-	server := initWebServer()
-	u := initUser(db)
-	u.RegisterRoutes(server)
-	err = server.Run(":8080")
+	//db, err := initDB()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//server := initWebServer()
+	//u := initUser(db)
+	//u.RegisterRoutes(server)
+	server := gin.Default()
+	err := server.Run(":8080")
+	server.GET("/hello", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "hello world")
+	})
 	if err != nil {
 		panic(err)
 	}

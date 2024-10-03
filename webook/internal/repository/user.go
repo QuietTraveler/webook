@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"webook/webook/internal/domain"
-	"webook/webook/internal/repository/dao"
+	"webook/internal/domain"
+	"webook/internal/repository/dao"
 )
 
 var (

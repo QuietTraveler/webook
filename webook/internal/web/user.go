@@ -9,8 +9,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"time"
-	"webook/webook/internal/domain"
-	"webook/webook/internal/service"
+	"webook/internal/domain"
+	"webook/internal/service"
 )
 
 // UserHandler 我准备在它上面定义跟用户有关的路由

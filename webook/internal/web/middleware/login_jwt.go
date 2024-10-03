@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"webook/webook/internal/web"
+	"webook/internal/web"
 )
 
 type LoginJWTMiddlewareBuilder struct {
